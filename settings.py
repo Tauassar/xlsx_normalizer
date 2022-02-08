@@ -5,7 +5,7 @@ max_search_index = 35
 fact_search_row = 0
 first_row = 6
 first_col = 1
-fact_sheet_name = 'Факт'
+fact_sheet_name = 'Лист1'
 
 search_strings = [
     'Инвестиционный проект/',

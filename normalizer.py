@@ -72,11 +72,16 @@ def write_xlsx(inp_list):
         for instance in inp_list:
             col_num = first_col
             for cell_val in instance:
-                sheet.cell(row=i, column=col_num).value = cell_val if cell_val is not None else ''
+                empty_val = '' if col_num < 13 else 0
+                sheet.cell(row=i, column=col_num).value = cell_val if cell_val is not None else empty_val
                 set_cell_style(sheet.cell(row=i, column=col_num))
+
+                if col_num >= 13:
+                    sheet.cell(row=i, column=col_num).number_format = '# ##0;-# ##0'
+
                 col_num += 1
             i += 1
-        sheet.title = 'Факт'
+        sheet.title = fact_sheet_name
         for idx, col in enumerate(sheet.columns, 1):
             sheet.column_dimensions[get_column_letter(idx)].auto_size = True
         set_header(sheet)
@@ -120,6 +125,7 @@ def read_xlsx_and_check_if_doc_satisfies_requirements(name):
         logger.info("Чтение файла ...")
         wb = load_workbook(name)
         ws = get_fact_sheet(wb)
+        logger.info(ws)
         logger.info('Проверка входного документа')
         sheet_name_check = check_if_sheet_name_satisfies_requirements(wb)
         sheet_content_check = check_if_sheet_content_positions_satisfies_requirements(ws)
@@ -142,10 +148,13 @@ def read_xlsx_and_check_if_doc_satisfies_requirements(name):
             logger.info(f'Запись в выходной файл инициирована')
             write_xlsx(data_rows)
             logger.info(f'Запись в выходной файл завершена, файл находится в папке "out"')
-            print(f'{Fore.RED}Необходимо пересохранить файл, для этого откройте файл в Excel и нажммите "Ctrl+S"')
     except ValueError as error:
         logger.error(error)
         logger.info('Выполнение скрипта завершается')
+    except PermissionError as error:
+        logger.error('Пожалуйста закройте входной Excel файл')
+        logger.info('Выполнение скрипта завершается')
+
 
 
 def get_input_file_name():

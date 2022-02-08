@@ -49,7 +49,7 @@ def get_indexes_for_search_values(ws):
     for value in search_strings:
         ws_indices[value] = search_value_in_col_idx(ws, search_string=value)
         logger.debug(f'{value}: {ws_indices[value]}')
-        if ws_indices[value] is None:
+        if ws_indices[value] is None and value != 'В рамках Бизнес-плана':
             raise ValueError(f'В исходном файле отсутствует данные для столбца {value}. Пожалуйста дополните данные в исходном документе')
 
     return ws_indices | search_fact_values(ws)
@@ -65,13 +65,13 @@ def get_fact_sheet(wb):
     logger.debug("Поиск листа с фактическими данными инициирован")
     if len(wb.sheetnames) > 1:
         for i, s in enumerate(wb.sheetnames):
-            if fact_sheet_name.lower() in s.lower():
+            if fact_sheet_name.lower() in s.lower() or 'факт' in s.lower():
                 fact_found = True
-                logger.debug(f'Лист с фактическими данными найден, наименование листа: {s}')
+                logger.info(f'Лист с фактическими данными найден, наименование листа: {s}')
                 break
         if fact_found:
             wb.active = i
-            logger.info(f'Лист {wb.active} установлен активным листом, из-за наличия слова "{fact_sheet_name}" в названии')
+            logger.info(f'Лист {wb.active} установлен активным листом, из-за наличия слова "Факт" "{fact_sheet_name}" в названии')
         else:
             logger.info(f'Лист с наименованием {fact_sheet_name} не найден, оставлен лист по умолчанию')
     return wb.active
